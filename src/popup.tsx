@@ -1,52 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { isCheckedKey } from "./constant";
 
 const Popup = () => {
-  const [count, setCount] = useState(0);
-  const [currentURL, setCurrentURL] = useState<string>();
+    const [isChecked, setIsChecked] = useState<boolean>(() => {
+        const saved = localStorage.getItem(isCheckedKey);
+        return saved ? JSON.parse(saved) : false;
+    })
 
-  useEffect(() => {
-    chrome.action.setBadgeText({ text: count.toString() });
-  }, [count]);
+    const handleSwitchChange = () => {
+        console.log("handleSwitchChange called");
+        setIsChecked((prev) => {
+            const next = !prev;
 
-  useEffect(() => {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      setCurrentURL(tabs[0].url);
-    });
-  }, []);
+            console.log("保存isChecked为" + next);
+            localStorage.setItem(isCheckedKey, JSON.stringify(next));
+            return next;
+        });
+    };
 
-  const changeBackground = () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      const tab = tabs[0];
-      if (tab.id) {
-        chrome.tabs.sendMessage(
-          tab.id,
-          {
-            color: "#555555",
-          },
-          (msg) => {
-            console.log("result message:", msg);
-          }
-        );
-      }
-    });
-  };
 
-  return (
-    <>
-      <ul style={{ minWidth: "700px" }}>
-        <li>Current URL: {currentURL}</li>
-        <li>Current Time: {new Date().toLocaleTimeString()}</li>
-      </ul>
-      <button
-        onClick={() => setCount(count + 1)}
-        style={{ marginRight: "5px" }}
-      >
-        count up
-      </button>
-      <button onClick={changeBackground}>change background</button>
-    </>
-  );
+    return (
+        <>
+            <label className="switch">
+                <input type="checkbox" checked={isChecked} onChange={() => {
+                    console.log("Checkbox clicked");
+                    handleSwitchChange();
+                }} />
+                <span className="slider round"></span>
+            </label>
+        </>
+    );
 };
 
 const root = createRoot(document.getElementById("root")!);
