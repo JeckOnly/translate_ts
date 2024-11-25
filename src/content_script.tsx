@@ -1,4 +1,4 @@
-import { Panel } from './panel';
+import {Panel} from './panel';
 import {isCheckedKey} from "./constant";
 
 // chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
@@ -12,38 +12,33 @@ import {isCheckedKey} from "./constant";
 // });
 
 
-
-
-
-
-
-
 let panel: Panel = new Panel();
 console.log("执行到这");
 
 window.onmouseup = function (e: MouseEvent): void {
-  const saved = localStorage.getItem(isCheckedKey);
-  let turnedOn: Boolean =  saved ? JSON.parse(saved) : false;
-  // log saved and turnedOn
-    console.log(saved);
-    console.log(turnedOn);
+    chrome.storage.local.get([isCheckedKey], (result) => {
+        if (result[isCheckedKey] !== undefined) {
+            const saved: Boolean = result[isCheckedKey];
+            console.log("isChecked is " + result[isCheckedKey] + " saved is " + saved);
 
-  if (!turnedOn) {
-    return;
-  }
-  let selection = window.getSelection();
-  if (!selection ) {
-    return;
-  }
-  let raw: string = selection.toString().trim();
-  let x: number = e.pageX;
-  let y: number = e.pageY;
+            if (!saved) {
+                return;
+            }
+            let selection = window.getSelection();
+            if (!selection) {
+                return;
+            }
+            let raw: string = selection.toString().trim();
+            let x: number = e.pageX;
+            let y: number = e.pageY;
 
-  if (!raw) {
-    return;
-  } else {
-    panel.pos({ x: x, y: y });
-    panel.translate(raw);
-    panel.show();
-  }
+            if (!raw) {
+                return;
+            } else {
+                panel.pos({x: x, y: y});
+                panel.translate(raw);
+                panel.show();
+            }
+        }
+    });
 }
