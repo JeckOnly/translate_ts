@@ -25,7 +25,12 @@ window.onmouseup = function (e: MouseEvent): void {
                 return;
             }
             let selection = window.getSelection();
+            console.log("selection is " + selection);
             if (!selection) {
+                return;
+            }
+            if (selection.toString().trim() === "" && !panel.contains(e)) {
+                panel.hide()
                 return;
             }
             let raw: string = selection.toString().trim();

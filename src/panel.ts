@@ -41,6 +41,10 @@ export class Panel {
         this.container.classList.add('show');
     }
 
+    isShow(): boolean {
+        return this.container.classList.contains('show');
+    }
+
     hide(): void {
         this.container.classList.remove('show');
     }
@@ -50,6 +54,12 @@ export class Panel {
             this.hide();
         };
     }
+
+    contains(e: MouseEvent): boolean {
+        return this.isShow() && this.container.contains(e.target as Node);
+    }
+
+
 
     translate(raw: string): void {
         this.source.innerText = raw;
@@ -65,6 +75,8 @@ export class Panel {
                 console.log("翻译为" + res[0][0][0]);
             });
     }
+
+
 
     pos(pos: { x: number; y: number }): void {
         this.container.style.top = pos.y + 'px';
