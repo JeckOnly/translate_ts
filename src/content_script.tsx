@@ -1,5 +1,6 @@
 import {Panel} from './panel';
 import {isCheckedKey} from "./constant";
+import {Word} from './word';
 
 // chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 //   if (msg.color) {
@@ -31,6 +32,16 @@ window.onmouseup = function (e: MouseEvent): void {
             }
             if (selection.toString().trim() === "" && !panel.contains(e)) {
                 panel.hide()
+                console.log("发送消息 查询单词");
+                chrome.runtime.sendMessage({ action: "getWords" }, (response) => {
+                    console.log("查询单词 Received response:", response);
+                    if (response.status === "success") {
+                        console.log("Retrieved words:", response.data);
+                    } else {
+                        console.error("Error:", response.message);
+                    }
+                });
+
                 return;
             }
             let raw: string = selection.toString().trim();
@@ -43,6 +54,20 @@ window.onmouseup = function (e: MouseEvent): void {
                 panel.pos({x: x, y: y});
                 panel.translate(raw);
                 panel.show();
+
+                console.log("发送消息 添加单词");
+                chrome.runtime.sendMessage(
+                    { action: "addWord", payload: Word.create("example") },
+                    (response) => {
+                        console.log("插入单词 Received response:", response);
+                        if (response.status === "success") {
+                            console.log("Word added successfully!");
+                        } else {
+                            console.error("Error:", response.message);
+                        }
+                    }
+                );
+
             }
         }
     });
